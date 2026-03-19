@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>เกมทายจังหวัดประเทศไทย 🇹🇭</title>
+<style>
+    body {
+        font-family: Arial;
+        text-align: center;
+        background: #f0f8ff;
+    }
+
+    canvas {
+        border: 2px solid #333;
+        margin-top: 20px;
+        background: #fff;
+    }
+
+    #score {
+        font-size: 22px;
+        margin-top: 10px;
+    }
+
+    select, button {
+        padding: 10px;
+        font-size: 16px;
+        margin: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>🎯 เกมทายจังหวัดจากแผนที่ประเทศไทย</h2>
+<p>ดูตำแหน่งจุด แล้วเลือกจังหวัดให้ถูกต้อง</p>
+
+<canvas id="mapCanvas" width="500" height="600"></canvas>
+
+<br>
+<select id="provinceSelect"></select>
+<button onclick="checkAnswer()">ตอบ</button>
+
+<div id="result"></div>
+<div id="score">Score: 0</div>
+
+<script>
+const canvas = document.getElementById("mapCanvas");
+const ctx = canvas.getContext("2d");
+
+// โหลดรูปแผนที่
+let img = new Image();
+img.src = "Thailand_location_map.svg";
+
+// 📍 ข้อมูลจังหวัด (ตัวอย่าง)
+const provinces = [
+    {name:"เชียงใหม่", x:200, y:100},
+    {name:"กรุงเทพ", x:250, y:350},
+    {name:"ภูเก็ต", x:200, y:500},
+    {name:"ขอนแก่น", x:300, y:250},
+    {name:"พิษณุโลก", x:260, y:200}
+];
+
+let current;
+let score = 0;
+
+// สร้าง dropdown
+const select = document.getElementById("provinceSelect");
+provinces.forEach(p=>{
+    let opt = document.createElement("option");
+    opt.value = p.name;
+    opt.text = p.name;
+    select.appendChild(opt);
+});
+
+// สุ่มคำถาม
+function newQuestion(){
+    current = provinces[Math.floor(Math.random()*provinces.length)];
+    drawMap();
+}
+
+// วาดแผนที่
+function drawMap(){
+    ctx.clearRect(0,0,500,600);
+    ctx.drawImage(img, 0, 0, 500, 600);
+
+    // วาดจุด
+    ctx.beginPath();
+    ctx.arc(current.x, current.y, 8, 0, Math.PI*2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+}
+
+// ตรวจคำตอบ
+function checkAnswer(){
+    let answer = select.value;
+
+    if(answer === current.name){
+        document.getElementById("result").innerHTML = "✅ ถูกต้อง!";
+        score += 10;
+    }else{
+        document.getElementById("result").innerHTML = "❌ ผิด! คำตอบคือ " + current.name;
+    }
+
+    document.getElementById("score").innerText = "Score: " + score;
+
+    newQuestion();
+}
+
+// โหลดภาพก่อนเริ่ม
+img.onload = function(){
+    newQuestion();
+};
+</script>
+
+</body>
+</html>

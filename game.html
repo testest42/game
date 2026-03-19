@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Guess The Number 🎯</title>
+<style>
+    body {
+        font-family: Arial;
+        text-align: center;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        padding-top: 50px;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.1);
+        padding: 30px;
+        border-radius: 20px;
+        display: inline-block;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    input {
+        padding: 10px;
+        font-size: 18px;
+        width: 120px;
+        border-radius: 10px;
+        border: none;
+        text-align: center;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+        margin-top: 10px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: #00c9a7;
+        color: white;
+    }
+
+    button:hover {
+        background: #00a387;
+    }
+
+    #message {
+        margin-top: 20px;
+        font-size: 22px;
+        font-weight: bold;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>🎯 Guess The Number</h1>
+    <p>ทายเลขระหว่าง 1 - 100</p>
+
+    <input type="number" id="guessInput" placeholder="ใส่เลข">
+    <br>
+    <button onclick="checkGuess()">ทาย!</button>
+    <button onclick="restartGame()">เริ่มใหม่</button>
+
+    <div id="message"></div>
+</div>
+
+<script>
+let number = Math.floor(Math.random() * 100) + 1;
+let attempts = 0;
+
+function checkGuess() {
+    const input = document.getElementById("guessInput");
+    const message = document.getElementById("message");
+    const guess = Number(input.value);
+
+    if (!guess) {
+        message.innerHTML = "⚠️ กรุณาใส่ตัวเลข";
+        return;
+    }
+
+    attempts++;
+
+    if (guess < number) {
+        message.innerHTML = "📉 น้อยเกินไป!";
+    } else if (guess > number) {
+        message.innerHTML = "📈 มากเกินไป!";
+    } else {
+        message.innerHTML = "🎉 ถูกต้อง! (ใช้ " + attempts + " ครั้ง)";
+    }
+
+    input.value = "";
+}
+
+function restartGame() {
+    number = Math.floor(Math.random() * 100) + 1;
+    attempts = 0;
+    document.getElementById("message").innerHTML = "🔄 เริ่มเกมใหม่แล้ว!";
+}
+</script>
+
+</body>
+</html>

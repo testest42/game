@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Shooting English Game</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(#000000, #333333);
+        font-family: Arial;
+        text-align: center;
+    }
+
+    canvas {
+        display: block;
+        margin: auto;
+        background: #111;
+    }
+
+    #info {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-size: 28px;
+    }
+
+    #newGameBtn {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #00c9a7;
+        color: white;
+    }
+
+    #newGameBtn:hover {
+        background: #00a387;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="info">Word: cat</div>
+<button id="newGameBtn" onclick="newGame()">New Game</button>
+
+<canvas id="gameCanvas" width="800" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+ctx.font = "28px Arial";
+
+let player;
+let bullets;
+let words;
+let frame;
+let gameOver;
+
+let keys = {};
+
+const vocab = [
+    {en:"cat", th:"แมว"},
+    {en:"dog", th:"สุนัข"},
+    {en:"apple", th:"แอปเปิ้ล"},
+    {en:"car", th:"รถ"},
+    {en:"book", th:"หนังสือ"},
+    {en:"water", th:"น้ำ"},
+    {en:"sun", th:"ดวงอาทิตย์"},
+    {en:"school", th:"โรงเรียน"}
+];
+
+let current;
+
+// เริ่มเกมใหม่
+function newGame(){
+    player = { x: 50, y: 180, w: 40, h: 40, speed: 5 };
+    bullets = [];
+    words = [];
+    frame = 0;
+    gameOver = false;
+
+    current = vocab[Math.floor(Math.random()*vocab.length)];
+    document.getElementById("info").innerText = "Word: " + current.en;
+}
+
+// ควบคุมปุ่ม
+document.addEventListener("keydown", function(e){
+    keys[e.code] = true;
+
+    if(e.code === "Space" && !gameOver){
+        bullets.push({x: player.x+40, y: player.y+20});
+    }
+});
+
+document.addEventListener("keyup", function(e){
+    keys[e.code] = false;
+});
+
+// สร้างคำ
+function spawnWord(){
+    let correct = Math.random() < 0.5;
+    let word;
+
+    if(correct){
+        word = current.th;
+    }else{
+        let rand = vocab[Math.floor(Math.random()*vocab.length)];
+        word = rand.th;
+    }
+
+    words.push({
+        x:800,
+        y:Math.random()*350,
+        text:word,
+        correct:(word === current.th)
+    });
+}
+
+// collision
+function hit(a,b){
+    return a.x < b.x + 60 &&
+           a.x + 10 > b.x &&
+           a.y < b.y + 40 &&
+           a.y + 10 > b.y;
+}
+
+// update
+function update(){
+    ctx.clearRect(0,0,800,400);
+
+    if(!gameOver){
+
+        if(keys["ArrowUp"]) player.y -= player.speed;
+        if(keys["ArrowDown"]) player.y += player.speed;
+
+        if(player.y < 0) player.y = 0;
+        if(player.y > 360) player.y = 360;
+
+        if(frame % 100 === 0) spawnWord();
+
+        bullets.forEach((b,i)=>{
+            b.x += 7;
+            ctx.fillStyle = "yellow";
+            ctx.fillRect(b.x,b.y,10,5);
+        });
+
+        words.forEach((w,i)=>{
+            w.x -= 3;
+            ctx.fillStyle = "white";
+            ctx.fillText(w.text, w.x, w.y);
+
+            bullets.forEach((b,j)=>{
+                if(hit(b,w)){
+                    if(w.correct){
+                        current = vocab[Math.floor(Math.random()*vocab.length)];
+                        document.getElementById("info").innerText = "Word: " + current.en;
+                        words.splice(i,1);
+                    }else{
+                        alert("❌ ยิงผิด!");
+                        gameOver = true;
+                    }
+                }
+            });
+        });
+
+        frame++;
+    }
+
+    ctx.fillStyle = "cyan";
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+
+    requestAnimationFrame(update);
+}
+
+// เริ่มเกมครั้งแรก
+newGame();
+update();
+</script>
+
+</body>
+</html>
